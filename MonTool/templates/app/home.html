@@ -1,0 +1,77 @@
+{% extends "app/base.html" %}
+{% block page_title %}Home{% endblock %}
+
+{% block custom_list %}
+    {% if request.user.is_authenticated %}
+        <li><a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a></li>
+        <li><a href="{% url 'add_server' %}" class="nav-link px-2 text-secondary">Add Server</a>
+        </li>
+        <li><a href="{% url 'my_servers' %}" class="nav-link px-2 text-secondary">My Servers</a></li>
+        <li><a href="{% url 'tg_integration' %}" class="nav-link px-2 text-secondary">Telegram</a></li>
+        <div class="d-flex ms-auto">
+            <li class="nav-item"><a href="{% url 'profile' %}" class="nav-link px-2 text-secondary">My
+                Profile</a></li>
+            <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link px-2 text-secondary">Logout</a></li>
+        </div>
+    {% else %}
+        <li><a href="{% url 'signup' %}" class="nav-link px-2 text-secondary">Sign Up</a></li>
+        <li><a href="{% url 'login' %}" class="nav-link px-2 text-secondary">Log In</a></li>
+    {% endif %}
+{% endblock %}
+{% block custom_body %}
+    {% if request.is_anonymous %}
+        <h1 style="text-align: center;">You don’t have access to this resource! Please log in or sign up first.</h1>
+    {% else %}
+        <style>
+            body {
+                background-color: #fff;
+                color: #212121;
+            }
+
+            .card {
+                background-color: #e9ecef; /* light grey background */
+                color: #212121; /* dark text */
+            }
+        </style>
+        <main class="container py-5">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <h2 class="mb-4">What We Offer</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card p-3 h-100">
+                        <h5 class="card-title">Real-Time Monitoring</h5>
+                        <p class="card-text">Keep track of CPU usage, RAM load, and disk space for both Windows and
+                            Linux servers.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-3 h-100">
+                        <h5 class="card-title">Network Health Checks</h5>
+                        <p class="card-text">Monitor uptime and status based on ping round-trip time.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-3 h-100">
+                        <h5 class="card-title">Telegram Bot Integration</h5>
+                        <p class="card-text">Get notified instantly when servers go down. View status, contact support,
+                            and refill your balance — all from Telegram.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-3 h-100">
+                        <h5 class="card-title">24/7 Reliability</h5>
+                        <p class="card-text">MonTool works around the clock to ensure you're always one step ahead of
+                            issues.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "app/base.html" %}
+
+{% block page_title %}Edit Profile{% endblock %}
+
+{% csrf_token %}
+{% block custom_list %}
+    {% if request.user.is_authenticated %}
+        <li><a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Feed</a></li>
+        <li><a href="{% url 'add_server' %}" class="nav-link px-2 text-secondary">Add
+            Server</a>
+        <li><a href="{% url 'my_servers' %}" class="nav-link px-2 text-secondary">My Servers</a></li>
+        <li><a href="{% url 'tg_integration' %}" class="nav-link px-2 text-secondary">Telegram</a></li>
+        <div class="d-flex ms-auto">
+            <li class="nav-item"><a href="{% url 'profile' %}"
+                                    class="nav-link px-2 text-secondary">My
+                Profile</a></li>
+            <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link px-2 text-secondary">Logout</a></li>
+        </div>
+    {% else %}
+        <li><a href="{% url 'signup' %}" class="nav-link px-2 text-secondary">Sign Up</a></li>
+        <li><a href="{% url 'login' %}" class="nav-link px-2 text-secondary">Log In</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block custom_body %}
+    {% if request.user.is_anonymous %}
+        <h1 style="text-align: center;">You don’t have access to this resource! Please log in or sign up first.</h1>
+    {% else %}
+            <main class="form-signin w-50 m-auto container">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h1 class="h3 mb-3 fw-normal">Edit profile</h1>
+                    <div class="form-floating">
+                        {{ form.first_name }}
+                        <label for="{{ form.first_name.id_for_label }}">First name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.last_name }}
+                        <label for="{{ form.last_name.id_for_label }}">Last name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.bio }}
+                        <label for="{{ form.bio.id_for_label }}">Bio</label>
+                    </div>
+                    <div class="form-floating">
+                        {{ form.birth_date }}
+                        <label for="{{ form.birth_date.id_for_label }}">Birth date</label>
+                    </div>
+                    <div class="form-floating">
+                        {{ form.photo }}
+                        <label for="{{ form.photo.id_for_label }}">Photo</label>
+                    </div>
+                    <button class="btn btn-dark w-100 py-2" type="submit">Submit</button>
+                </form>
+            </main>
+    {% endif %}
+{% endblock %}

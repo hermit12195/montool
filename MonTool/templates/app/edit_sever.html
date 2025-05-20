@@ -1,0 +1,72 @@
+{% extends "app/base.html" %}
+
+
+{% block page_title %}Create Task{% endblock %}
+
+{% csrf_token %}
+{% block custom_list %}
+    {% if request.user.is_authenticated %}
+        <li><a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a></li>
+        <li><a href="{% url 'add_server' %}" class="nav-link px-2 text-secondary">Add Server</a>
+        <li><a href="{% url 'my_servers' %}" class="nav-link px-2 text-secondary">My Servers</a></li>
+        <li><a href="{% url 'tg_integration' %}" class="nav-link px-2 text-secondary">Telegram</a></li>
+        <div class="d-flex ms-auto">
+            <li class="nav-item"><a href="{% url 'profile' %}" class="nav-link px-2 text-secondary">My
+                Profile</a></li>
+            <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link px-2 text-secondary">Logout</a></li>
+        </div>
+    {% else %}
+        <li><a href="{% url 'signup' %}" class="nav-link px-2 text-secondary">Sign Up</a></li>
+        <li><a href="{% url 'login' %}" class="nav-link px-2 text-secondary">Log In</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block custom_body %}
+    {% if request.user.is_anonymous %}
+        <h1 style="text-align: center;">You don’t have access to this resource! Please log in or sign up first.</h1>
+    {% else %}
+            <main class="form-signin w-25 m-auto container">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <ul>
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }} </li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <h1 class="h3 mb-3 fw-normal">Edit the server</h1>
+
+                    <div class="form-floating">
+                        {{ form.server_name }}
+                        <label for="{{ form.server_name.id_for_label }}">Server Name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.user_name }}
+                        <label for="{{ form.user_name.id_for_label }}">OS User Name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.server_ip }}
+                        <label for="{{ form.server_ip.id_for_label }}">Server IP Address(IPv4)</label>
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.password }}
+                        <label for="{{ form.password.id_for_label }}">Password</label>
+                    </div>
+                    <div class="form-floating">
+                        {{ form.os_name }}
+                        <label for="{{ form.os_name.id_for_label }}">OS type</label>
+                    </div>
+                    <button class="btn btn-dark w-100 py-2" type="submit">Submit</button>
+                </form>
+            </main>
+    {% endif %}
+{% endblock %}

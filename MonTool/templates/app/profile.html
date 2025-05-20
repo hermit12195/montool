@@ -1,0 +1,97 @@
+{% extends "app/base.html" %}
+
+{% block page_title %}Create Task{% endblock %}
+
+{% csrf_token %}
+{% block custom_list %}
+    {% if request.user.is_authenticated %}
+        <li><a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a></li>
+        <li><a href="{% url 'add_server' %}" class="nav-link px-2 text-secondary">Add
+            Server</a>
+        <li><a href="{% url 'my_servers' %}" class="nav-link px-2 text-secondary">My Servers</a></li>
+        <li><a href="{% url 'tg_integration' %}" class="nav-link px-2 text-secondary">Telegram</a></li>
+        <div class="d-flex ms-auto">
+            <li class="nav-item"><a href="{% url 'profile' %}"
+                                    class="nav-link px-2 text-secondary">My
+                Profile</a></li>
+            <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link px-2 text-secondary">Logout</a></li>
+        </div>
+    {% else %}
+        <li><a href="{% url 'signup' %}" class="nav-link px-2 text-secondary">Sign Up</a></li>
+        <li><a href="{% url 'login' %}" class="nav-link px-2 text-secondary">Log In</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block custom_body %}
+    {% if user.is_anonymous %}
+        <h1 style="text-align: center;">You don’t have access to this resource! Please log in or sign up first.</h1>
+    {% else %}
+        <main class="form-signin w-50 m-auto container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% if request.user.profiles %}
+                <p></p>
+                <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top container">
+                    {% if request.user.profiles.photo %}
+                        <img src="{{ request.user.profiles.photo.url }}" style="width:290px;height:290px;"
+                             alt="Profile Photo">
+                    {% else %}
+                        <img src="/media/default.png" style="width:430px;height:290px;" alt="Default Photo">
+                    {% endif %}
+                    <div class="col-lg-8 rounded text-body-emphasis bg-dark-subtle mb-4 p-4">
+                        <div class="col-lg-6 px-0">
+                            <h3 class="display-5 fst-italic">{{ request.user.profiles.first_name }} {{ request.user.profiles.last_name }}</h3>
+                            <p class="display-7">Birth Date: {{ request.user.profiles.birth_date }}</p>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary container">
+                    <div class="col-lg-6 px-0">
+                        <p class="display-7">Bio: {{ request.user.profiles.bio }}</p>
+                    </div>
+                </div>
+                <form action="{% url 'edit_profile' %}" method="post"
+                      style="text-align: right">
+                    {% csrf_token %}
+                    <button class="btn btn-dark w-100 py-2" type="submit">Edit Profile</button>
+                </form>
+            {% else %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h1 class="h3 mb-3 fw-normal">Create profiles</h1>
+
+                    <div class="form-floating">
+                        {{ form.first_name }}
+                        <label for="{{ form.first_name.id_for_label }}">First name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.last_name }}
+                        <label for="{{ form.last_name.id_for_label }}">Last name</label>
+                    </div>
+
+                    <div class="form-floating">
+                        {{ form.bio }}
+                        <label for="{{ form.bio.id_for_label }}">Bio</label>
+                    </div>
+                    <div class="form-floating">
+                        {{ form.birth_date }}
+                        <label for="{{ form.birth_date.id_for_label }}">Birth date</label>
+                    </div>
+                    <div class="form-floating">
+                        {{ form.photo }}
+                        <label for="{{ form.photo.id_for_label }}">Photo</label>
+                    </div>
+                    <button class="btn btn-dark w-100 py-2" type="submit">Submit</button>
+                </form>
+            {% endif %}
+        </main>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "app/base.html" %}
+
+{% block page_title %}Server State{% endblock %}
+
+{% csrf_token %}
+{% block custom_list %}
+    {% if request.user.is_authenticated %}
+        <li><a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a></li>
+        <li><a href="{% url 'add_server' %}" class="nav-link px-2 text-secondary">Add Server</a>
+        <li><a href="{% url 'my_servers' %}" class="nav-link px-2 text-secondary">My Servers</a></li>
+        <li><a href="{% url 'tg_integration' %}" class="nav-link px-2 text-secondary">Telegram</a></li>
+        <div class="d-flex ms-auto">
+            <li class="nav-item"><a href="{% url 'profile' %}" class="nav-link px-2 text-secondary">My
+                Profile</a></li>
+            <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link px-2 text-secondary">Logout</a></li>
+        </div>
+    {% else %}
+        <li><a href="{% url 'signup' %}" class="nav-link px-2 text-secondary">Sign Up</a></li>
+        <li><a href="{% url 'login' %}" class="nav-link px-2 text-secondary">Log In</a></li>
+    {% endif %}
+{% endblock %}
+
+{% block custom_body %}
+    {% if user.is_anonymous %}
+        <h1 style="text-align: center;">You don’t have access to this resource! Please log in or sign up first.</h1>
+    {% else %}
+        <p></p>
+        <div class="p-4 rounded text-body-emphasis bg-body-secondary container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <h1 class="display-4 fst-italic">{{ server.server_name }}</h1>
+            <p class="lead my-3">{{ server.server_ip }}</p>
+
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Memory</h5>
+                            <p class="card-text">
+                                Free: <span
+                                    id="free-memory">{{ free_memory.0|default:"Loading..." }}</span> {{ free_memory.1 }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Disk</h5>
+                            <p class="card-text">
+                                Free: <span
+                                    id="free-disk">{{ free_disk.0|default:"Loading..." }}</span> {{ free_disk.1 }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">CPU</h5>
+                            <p class="card-text">
+                                Load: <span id="cpu-load">{{ cpu_load|default:"Loading..." }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div style="text-align: right">
+                <a href="{% url 'edit_server' server_id=server.id %}"
+                   class="btn btn-light w-20 py-2">Edit</a>
+                <a href="{% url 'delete_server' server_id=server.id %}"
+                   class="btn btn-secondary w-20 py-2" type="submit">Delete</a>
+            </div>
+        </div>
+
+        <script>
+            function refreshStats() {
+                fetch("{% url 'server_details' server.id %}")
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+
+                        document.getElementById('free-memory').textContent =
+                            doc.getElementById('free-memory').textContent;
+                        document.getElementById('free-disk').textContent =
+                            doc.getElementById('free-disk').textContent;
+                        document.getElementById('cpu-load').textContent =
+                            doc.getElementById('cpu-load').textContent;
+                    });
+            }
+
+            setInterval(refreshStats, 30000);
+
+            window.addEventListener('beforeunload', () => {
+                fetch(`/stop_monitoring/{{ server.id }}/`, {
+                    method: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}

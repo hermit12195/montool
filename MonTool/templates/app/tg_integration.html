@@ -1,0 +1,61 @@
+{% extends "app/base.html" %}
+{% block page_title %}Telegram{% endblock %}
+
+{% block custom_list %}
+    {% if request.user.is_authenticated %}
+        <li><a href="{% url 'home' %}" class="nav-link px-2 text-secondary">Home</a></li>
+        <li><a href="{% url 'add_server' %}" class="nav-link px-2 text-secondary">Add Server</a>
+        </li>
+        <li><a href="{% url 'my_servers' %}" class="nav-link px-2 text-secondary">My Servers</a></li>
+        <li><a href="{% url 'tg_integration' %}" class="nav-link px-2 text-secondary">Telegram</a></li>
+        <div class="d-flex ms-auto">
+            <li class="nav-item"><a href="{% url 'profile' %}" class="nav-link px-2 text-secondary">My
+                Profile</a></li>
+            <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link px-2 text-secondary">Logout</a></li>
+        </div>
+    {% else %}
+        <li><a href="{% url 'signup' %}" class="nav-link px-2 text-secondary">Sign Up</a></li>
+        <li><a href="{% url 'login' %}" class="nav-link px-2 text-secondary">Log In</a></li>
+    {% endif %}
+{% endblock %}
+{% block custom_body %}
+    {% if request.is_anonymous %}
+        <h1 style="text-align: center;">You don’t have access to this resource! Please log in or sign up first.</h1>
+    {% else %}
+        <div class="container py-5">
+            <h1 class="mb-4">Telegram Bot Integration</h1>
+
+            <div class="mb-4">
+
+                <div class="p-4 rounded text-body-emphasis bg-body-secondary container">
+                    Our Telegram bot provides real-time server status updates, notifications for downtimes, and allows
+                    interaction
+                    with your monitored servers directly from the Telegram app.
+                </div>
+                    <strong>You can:</strong>
+                <div class="p-4 rounded text-body-emphasis bg-body-secondary container">
+                    <ul>
+                        <li>Receive alerts when your server is down</li>
+                        <li>List all your servers with current health status</li>
+                        <li>Refill your account balance</li>
+                        <li>Contact support instantly</li>
+                    </ul>
+                </div>
+            </div>
+            <h3>How to Enable Telegram Integration</h3>
+            <a href="https://t.me//mytesttesttest12121bot" class="btn btn-dark w-100 py-2">
+                Open Telegram Bot
+            </a>
+            <ol class="mb-5">
+                <li>Click <strong>Start</strong> to activate the bot</li>
+                <li>Create your profile</li>
+                <li>Once linked, you will start receiving updates automatically</li>
+                <li>Enjoy functionalities!</li>
+            </ol>
+            <div class="alert alert-warning">
+                <strong>Note:</strong> Make sure your email in the app matches the one used during bot linking for
+                proper integration.
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

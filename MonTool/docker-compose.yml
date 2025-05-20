@@ -1,0 +1,81 @@
+services:
+  montool-db:
+    image: postgres:17.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+      - ./media:/app/media
+      - ./logs:/app/logs
+
+  web:
+    build: .
+    command: uvicorn MonTool.asgi:application --host 0.0.0.0 --port 8000 --reload
+    environment:
+      DJANGO_SETTINGS_MODULE: "MonTool.settings"
+      STATIC_ROOT: "/app/static"
+    volumes:
+      - .:/app
+      - static-volume:/app/static
+    env_file:
+      - .env
+    depends_on:
+      - montool-db
+    ports:
+      - "8000:8000"
+
+  redis:
+    image: redis:7.4.2
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    command: ./celery_tasks/start_celery.sh
+    environment:
+      - DJANGO_SETTINGS_MODULE=MonTool.settings
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+
+  celery_beat:
+    build: .
+    command: celery -A celery_tasks beat -l INFO
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+
+  flower:
+    image: mher/flower:2.0.1
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+
+  montool-tgbot:
+    build: .
+    container_name: montool-tgbot
+    command: python ./montoolbot/main.py
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    environment:
+      - PYTHONPATH=/app
+      - DJANGO_SETTINGS_MODULE=MonTool.settings
+    volumes:
+      - ./logs:/app/logs
+      - .:/app
+
+volumes:
+  db-volume:
+  static-volume:
+  logs:
+
